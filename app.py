@@ -3,9 +3,9 @@ import streamlit as st
 # ========================= IMPORTS =========================
 from calculus import chapters
 from topics_content import generate_topic_prompt
-from components.content_renderer import render_content
-from components.sidebar import render_sidebar
-from services.groq_service import ask_groq
+from content_renderer import render_content
+from sidebar import render_sidebar
+from groq_service import ask_groq
 
 # ========================= PAGE CONFIG =========================
 st.set_page_config(page_title="MAI — Mathematical AI", layout="wide")

@@ -1,7 +1,7 @@
 # components/sidebar.py
 
 import streamlit as st
-from services.groq_service import ask_groq
+from groq_service import ask_groq
 
 def render_sidebar():
     """Render MAI sidebar tools."""

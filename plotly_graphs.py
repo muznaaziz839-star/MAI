@@ -1,5 +1,5 @@
 import numpy as np
-import plotly.graph_objects as go
+from plotly import graph_objects as go
 
 def plot_graph(topic):
     x = np.linspace(-10, 10, 400)

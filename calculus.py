@@ -1,5 +1,6 @@
 chapters = {
     "Chapter 1: Functions and Models": [
+        "Functions and Their Graphs",
         "Four Ways to Represent a Function",
         "Mathematical Models",
         "Exponential Functions",

@@ -17,6 +17,10 @@ st.write("AI-powered assistant for learning Calculus.")
 # ========================= SIDEBAR =========================
 render_sidebar()
 
+# ========================= INIT SESSION STATE =========================
+if "lecture" not in st.session_state:
+    st.session_state.lecture = None
+
 # ========================= COURSE =========================
 course = "Calculus"
 
@@ -34,16 +38,26 @@ selected_topic = st.selectbox(
     chapters[selected_chapter]
 )
 
-# ===== Lecture ======
+# ========================= GENERATE LECTURE =========================
 if st.button("Generate Lecture"):
 
     with st.spinner("Generating lecture..."):
-
         prompt = generate_topic_prompt(selected_topic)
         response = ask_groq(prompt)
 
-        # ✅ FIXED: Use renderer
-        render_content(response)
+        if response and "🚨" not in response:
+            st.session_state.lecture = response
+        else:
+            st.session_state.lecture = "❌ Failed to generate lecture."
+
+# ========================= DISPLAY LECTURE =========================
+if st.session_state.lecture:
+
+    st.markdown("---")
+    st.subheader(f"📖 Lecture: {selected_topic}")
+
+    # Render formatted content
+    st.markdown(st.session_state.lecture)
 
 # ========================= FOOTER =========================
 st.markdown("---")

@@ -1,64 +1,203 @@
 import streamlit as st
 
-# ========================= IMPORTS =========================
 from calculus import chapters
 from topics_content import generate_topic_prompt
-from content_renderer import render_content
 from sidebar import render_sidebar
 from groq_service import ask_groq
+from mcq_generator import render_mcq_generator
 
-# ========================= PAGE CONFIG =========================
-st.set_page_config(page_title="MAI — Mathematical AI", layout="wide")
+# ===================== PAGE CONFIG =====================
+st.set_page_config(
+    page_title="MAI -Mathematical Artificial Intelligence",
+    layout="wide",
+    page_icon=""
+)
 
-# ========================= HEADER =========================
-st.title("📘 MAI — Mathematical Artificial Intelligence")
-st.write("AI-powered assistant for learning Calculus.")
+# ===================== SAAS STYLE UI =====================
+st.markdown("""
+<style>
 
-# ========================= SIDEBAR =========================
-render_sidebar()
+/* Background */
+.stApp {
+    background-color: #F6F8FB;
+    font-family: 'Arial';
+}
 
-# ========================= INIT SESSION STATE =========================
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #0F172A;
+}
+
+/* Sidebar text */
+[data-testid="stSidebar"] * {
+    color: #E5E7EB;
+}
+
+/* Buttons */
+.stButton > button {
+    background-color: #2563EB;
+    color: white;
+    border-radius: 10px;
+    height: 44px;
+    font-weight: 600;
+    border: none;
+}
+
+.stButton > button:hover {
+    background-color: #1D4ED8;
+}
+
+/* Cards */
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.04);
+}
+
+/* Titles */
+h1, h2, h3 {
+    color: #111827;
+}
+
+/* Remove clutter */
+footer {visibility: hidden;}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ===================== SIDEBAR =====================
+mode = render_sidebar()
+
+# ===================== SESSION =====================
 if "lecture" not in st.session_state:
     st.session_state.lecture = None
 
-# ========================= COURSE =========================
-course = "Calculus"
+if "mcqs" not in st.session_state:
+    st.session_state.mcqs = []
 
-st.header("📚 Select Course Content")
-st.write(f"### Course: {course}")
+# ===================== HEADER (SAAS DASHBOARD STYLE) =====================
+st.markdown("""
+<style>
 
-# ========================= CHAPTER & TOPIC =========================
-selected_chapter = st.selectbox(
-    "Select Chapter",
-    list(chapters.keys())
-)
+/* ================= MAIN BACKGROUND ================= */
+.stApp {
+    background-color: #F6F8FB;
+    font-family: 'Arial';
+}
 
-selected_topic = st.selectbox(
-    "Select Topic",
-    chapters[selected_chapter]
-)
+/* ================= SIDEBAR (LIGHT THEME) ================= */
+[data-testid="stSidebar"] {
+    background-color: #FFFFFF;
+    border-right: 1px solid #E5E7EB;
+}
 
-# ========================= GENERATE LECTURE =========================
-if st.button("Generate Lecture"):
+/* Sidebar text */
+[data-testid="stSidebar"] * {
+    color: #111827;
+}
 
-    with st.spinner("Generating lecture..."):
-        prompt = generate_topic_prompt(selected_topic)
-        response = ask_groq(prompt)
+/* ================= BUTTONS (LIGHT SAAS STYLE) ================= */
+.stButton > button {
+    background-color: #2563EB;
+    color: white;
+    border-radius: 10px;
+    height: 44px;
+    font-weight: 600;
+    border: none;
+    transition: 0.2s ease;
+}
 
-        if response and "🚨" not in response:
+/* Hover effect */
+.stButton > button:hover {
+    background-color: #1D4ED8;
+    transform: scale(1.01);
+}
+
+/* ================= SELECT BOX ================= */
+div[data-baseweb="select"] {
+    background-color: white;
+    border-radius: 8px;
+}
+
+/* ================= CARD STYLE ================= */
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 12px;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0px 2px 8px rgba(0,0,0,0.04);
+}
+
+/* ================= HEADINGS ================= */
+h1, h2, h3 {
+    color: #111827;
+}
+
+/* ================= REMOVE FOOTER ================= */
+footer {visibility: hidden;}
+
+/* ================= SIDEBAR RADIO BUTTON CLEAN ================= */
+[data-testid="stSidebar"] label {
+    font-weight: 500;
+}
+
+</style>
+""", unsafe_allow_html=True)
+# ===================== MODE TITLE =====================
+st.markdown("### Select Course Content")
+
+# ===================== COURSE SELECTION =====================
+col1, col2 = st.columns(2)
+
+with col1:
+    selected_chapter = st.selectbox("Chapter", list(chapters.keys()))
+
+with col2:
+    selected_topic = st.selectbox("Topic", chapters[selected_chapter])
+
+# =========================================================
+# 📘 LECTURE MODE
+# =========================================================
+if mode == "Lecture Mode":
+
+    st.markdown("## 📘 Lecture Generator")
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    if st.button("Generate Lecture"):
+
+        with st.spinner("Generating AI lecture..."):
+
+            prompt = generate_topic_prompt(selected_topic)
+            response = ask_groq(prompt)
+
             st.session_state.lecture = response
-        else:
-            st.session_state.lecture = "❌ Failed to generate lecture."
 
-# ========================= DISPLAY LECTURE =========================
-if st.session_state.lecture:
+    if st.session_state.lecture:
+        st.markdown(st.session_state.lecture)
 
-    st.markdown("---")
-    st.subheader(f"📖 Lecture: {selected_topic}")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    # Render formatted content
-    st.markdown(st.session_state.lecture)
+# =========================================================
+# 📝 ASSESSMENT MODE
+# =========================================================
+elif mode == "Assessment Generator":
 
-# ========================= FOOTER =========================
+    st.markdown("## 📝 Assessment System")
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+
+    render_mcq_generator(selected_topic)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# =========================================================
+# FOOTER
+# =========================================================
 st.markdown("---")
-st.caption("MAI © 2026 | Powered by Groq AI")
+st.markdown(
+    "<p style='text-align:center;color:#9CA3AF;'>MAI © 2026 | AI Learning Platform</p>",
+    unsafe_allow_html=True
+)

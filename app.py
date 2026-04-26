@@ -1,5 +1,6 @@
 import streamlit as st
-
+from calculus import chapters as calculus
+from linear_algebra import linear_algebra
 from calculus import chapters
 from topics_content import generate_topic_prompt
 from sidebar import render_sidebar
@@ -145,17 +146,30 @@ footer {visibility: hidden;}
 
 </style>
 """, unsafe_allow_html=True)
+# ===================== COURSE SELECTION =====================
+st.markdown("### **Select Course**")
+
+course = st.selectbox(
+    "",
+    ["Calculus", "Linear Algebra"]
+)
+
+if course == "Calculus":
+    syllabus = calculus
+else:
+    syllabus = linear_algebra
+
 # ===================== MODE TITLE =====================
 st.markdown("### Select Course Content")
 
-# ===================== COURSE SELECTION =====================
+# ===================== COURSE CONTENT =====================
 col1, col2 = st.columns(2)
 
 with col1:
-    selected_chapter = st.selectbox("Chapter", list(chapters.keys()))
+    selected_chapter = st.selectbox("Chapter", list(syllabus.keys()))
 
 with col2:
-    selected_topic = st.selectbox("Topic", chapters[selected_chapter])
+    selected_topic = st.selectbox("Topic", syllabus[selected_chapter])
 
 # =========================================================
 # 📘 LECTURE MODE
@@ -170,7 +184,7 @@ if mode == "Lecture Mode":
 
         with st.spinner("Generating AI lecture..."):
 
-            prompt = generate_topic_prompt(selected_topic)
+            prompt = generate_topic_prompt(course, selected_topic)
             response = ask_groq(prompt)
 
             st.session_state.lecture = response
@@ -185,11 +199,29 @@ if mode == "Lecture Mode":
 # =========================================================
 elif mode == "Assessment Generator":
 
-    st.markdown("## 📝 Assessment System")
+
+    with st.container():
+        render_mcq_generator(selected_topic)
+
+# ====================SOLVE PROBLEM========================#
+elif mode == "Solve Problems":
+
+    st.markdown("## Solve Problems")
 
     st.markdown('<div class="card">', unsafe_allow_html=True)
 
-    render_mcq_generator(selected_topic)
+    problem = st.text_area("Enter your problem here")
+
+    if st.button("Solve Problem"):
+
+        if problem.strip():
+            with st.spinner("Solving..."):
+                prompt = f"Solve this mathematical problem step by step:\n\n{problem}"
+                response = ask_groq(prompt)
+                st.markdown(response)
+
+        else:
+            st.warning("Please enter a problem first.")
 
     st.markdown("</div>", unsafe_allow_html=True)
 

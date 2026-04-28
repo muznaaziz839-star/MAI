@@ -151,7 +151,7 @@ st.markdown("### **Select Course**")
 
 course = st.selectbox(
     "",
-    ["Calculus", "Linear Algebra"]
+    ["Calculus", "Abstract Algebra"]
 )
 
 if course == "Calculus":

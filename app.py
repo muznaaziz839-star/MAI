@@ -147,6 +147,7 @@ footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 # ===================== COURSE SELECTION =====================
+st.markdown("### **MAI-Mathematical Artificial Intelligence**")
 st.markdown("### **Select Course**")
 
 course = st.selectbox(

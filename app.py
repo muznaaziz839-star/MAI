@@ -6,7 +6,7 @@ from topics_content import generate_topic_prompt
 from sidebar import render_sidebar
 from groq_service import ask_groq
 from mcq_generator import render_mcq_generator
-
+from plotly_graphs import plot_graph
 # ===================== PAGE CONFIG =====================
 st.set_page_config(
     page_title="MAI -Mathematical Artificial Intelligence",
@@ -191,7 +191,21 @@ if mode == "Lecture Mode":
             st.session_state.lecture = response
 
     if st.session_state.lecture:
-        st.markdown(st.session_state.lecture)
+     lecture_text = st.session_state.lecture
+
+    # ================= SHOW LECTURE =================
+    st.markdown(lecture_text)
+
+    # ================= GRAPH DETECTION =================
+    graph_keywords = ["derivative", "integral", "graph", "plot", "function"]
+
+    should_plot = any(word in lecture_text.lower() for word in graph_keywords)
+
+    if should_plot:
+        st.markdown("### 📊 Graph Visualization")
+
+        fig = plot_graph(selected_topic)
+        st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
 

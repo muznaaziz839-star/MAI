@@ -1,4 +1,4 @@
-linear_algebra = {
+abstract_algebra = {
     "Chapter 1: Sets and Relations": [
         "Sets",
         "Relations"
